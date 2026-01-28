@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 type User struct {
@@ -15,6 +17,53 @@ type User struct {
 
 var users = make(map[int]User)
 var nextID = 1
+
+const filename = "user.txt"
+
+// file handling
+func LoadUserFromFile() error {
+	file, err := os.Open(filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	defer file.Close()
+
+	Scanner := bufio.NewScanner(file)
+	for Scanner.Scan() {
+		Line := Scanner.Text()
+		Parts := strings.Split(Line, ",")
+		if len(Parts) != 3 {
+			continue
+		}
+		id, _ := strconv.Atoi(Parts[0])
+		name := Parts[1]
+		email := Parts[2]
+
+		users[id] = User{Id: id, Name: name, Email: email}
+		if id >= nextID {
+			nextID = id + 1
+		}
+	}
+	return Scanner.Err()
+}
+
+func SaveUserToFile() error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	writer := bufio.NewWriter(file)
+	for _, user := range users {
+		Line := fmt.Sprintf("%d,%s,%s\n", user.Id, user.Name, user.Email)
+		writer.WriteString(Line)
+	}
+	return writer.Flush()
+}
 
 // create error handling
 func CreateUser(name, email string) error {
@@ -34,7 +83,7 @@ func CreateUser(name, email string) error {
 	users[nextID] = user
 	nextID++
 
-	return nil
+	return SaveUserToFile()
 }
 
 // read error handling
@@ -63,7 +112,7 @@ func Updateuser(id int, name string) error {
 	}
 	user.Name = name
 	users[id] = user
-	return nil
+	return SaveUserToFile()
 }
 
 // Delete error handling
@@ -76,7 +125,7 @@ func DeleteUser(id int) error {
 	}
 	delete(users, id)
 
-	return nil
+	return SaveUserToFile()
 }
 
 // pause func
@@ -86,6 +135,11 @@ func Pause() {
 	reader.ReadString('\n')
 }
 func ErrorHandling() {
+	err := LoadUserFromFile()
+	if err != nil {
+		fmt.Println("Error loading file:", err)
+		return
+	}
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Println("-----CRUD operations-----")
