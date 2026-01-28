@@ -1,9 +1,15 @@
 package main
 
-import "revision/revision"
+import (
+	"revision/forloop"
+)
 
 func main() {
 	// revision.ErrorHandling()
 	// revision.ErrorHandlingWithDatabases()
-	revision.ErrorHandlingUsingServer()
+	// revision.ErrorHandlingUsingServer()
+	// forloop.Loop()
+	// forloop.LoopReverse()
+	// forloop.Rightangletraingle()
+	forloop.ReverseRightAngleTraingle()
 }
