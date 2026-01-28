@@ -1,8 +1,10 @@
 package revision
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"os"
 )
 
 type User struct {
@@ -76,7 +78,15 @@ func DeleteUser(id int) error {
 
 	return nil
 }
+
+// pause func
+func Pause() {
+	fmt.Println("Press enter to continue...")
+	reader := bufio.NewReader(os.Stdin)
+	reader.ReadString('\n')
+}
 func ErrorHandling() {
+	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Println("-----CRUD operations-----")
 		fmt.Println("1.Create user")
@@ -102,6 +112,7 @@ func ErrorHandling() {
 			} else {
 				fmt.Println("user created succesfully")
 			}
+			Pause()
 		case 2:
 			var id int
 			fmt.Println("Enter id:")
@@ -113,6 +124,7 @@ func ErrorHandling() {
 			} else {
 				fmt.Printf("ID: %d, name: %s, Email:%s\n", user.Id, user.Name, user.Email)
 			}
+			Pause()
 		case 3:
 			var id int
 			var name string
@@ -126,6 +138,7 @@ func ErrorHandling() {
 			} else {
 				fmt.Println("Updated succesfully")
 			}
+			Pause()
 		case 4:
 			var id int
 			fmt.Println("Enter id:")
@@ -135,6 +148,7 @@ func ErrorHandling() {
 			} else {
 				fmt.Println("deleted succesfully")
 			}
+			Pause()
 		case 5:
 			fmt.Println("Exiting succesfully...")
 
@@ -142,6 +156,8 @@ func ErrorHandling() {
 
 		default:
 			fmt.Println("Invalid choice")
+			Pause()
 		}
+		reader.ReadString('\n')
 	}
 }
